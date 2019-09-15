@@ -73,7 +73,7 @@ UserSchema.pre<UserDoc>('remove', async function(next): Promise<void> {
 })
 
 UserSchema.methods.generateJwt = async function(): Promise<string> {
-  const token = jwt.sign({ _id: this.id.toString() }, process.env.JWT_SECRET)
+  const token = jwt.sign({ _id: this._id.toString() }, process.env.JWT_SECRET)
   this.tokens = [...this.tokens, { token }]
   await this.save()
   return token

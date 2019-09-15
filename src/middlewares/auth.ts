@@ -11,7 +11,7 @@ export interface EnhancedRequest extends Request {
 export const auth = async (req: EnhancedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const token = req.header('Authorization').replace('Bearer ', '')
-    const { _id } = jwt.verify(token, process.env.JWT_SECRET) as { _id: string; iat: number }
+    const { _id }: any = jwt.verify(token, process.env.JWT_SECRET)
     const user = await User.findOne({ _id, 'tokens.token': token })
 
     if (!user) throw Error()
