@@ -6,7 +6,7 @@ export const deleteUser = async (req: EnhancedRequest, res: Response): Promise<v
   try {
     await req.user.remove()
     sendGoodbyeEmail(req.user.email, req.user.name)
-    res.status(200).send({ message: 'User deleted' })
+    res.status(200).send()
   } catch (error) {
     res.status(500).send({ error })
   }

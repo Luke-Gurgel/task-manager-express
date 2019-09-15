@@ -5,8 +5,8 @@ export const loginUser = async (req: Request, res: Response): Promise<Response |
   const { email, password } = req.body
   try {
     const user = await User.findByCredentials({ email, password })
-    await user.generateJwt()
-    res.status(200).send({ user })
+    const token = await user.generateJwt()
+    res.status(200).send({ user, token })
   } catch (error) {
     res.status(400).send({ error: error.message })
   }
