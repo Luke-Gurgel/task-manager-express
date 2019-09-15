@@ -1,12 +1,14 @@
 module.exports = {
-  parser: '@typescript-eslint/parser',
+  parser: 'babel-eslint',
   env: {
     es6: true,
-    node: true
+    node: true,
+    "jest/globals": true
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'jest'],
   extends: [
     'plugin:@typescript-eslint/recommended',
+    "plugin:jest/recommended",
     'prettier/@typescript-eslint',
     'standard'
   ],
@@ -16,7 +18,8 @@ module.exports = {
   },
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: 'module'
+    sourceType: 'module',
+    plugins: ['typescript']
   },
   rules: {
     "space-before-function-paren": "off",
