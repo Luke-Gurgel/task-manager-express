@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import app from '../src/app'
 import User from '../src/models/user'
 
+const authHeader = 'Authorization'
 const testId = new mongoose.Types.ObjectId()
 const testUser = {
   _id: testId,
@@ -88,7 +89,7 @@ test('should not log in a nonexistent user', async () => {
 test('should get profile for user', async () => {
   await req(app)
     .get('/users/me')
-    .set('Authorization', 'Bearer ' + testUser.tokens[0].token)
+    .set(authHeader, 'Bearer ' + testUser.tokens[0].token)
     .send()
     .expect(200)
 })
@@ -103,7 +104,7 @@ test('should not return profile for unauthorized user', async () => {
 test("should delete user's account if authorized", async () => {
   await req(app)
     .delete('/users/me')
-    .set('Authorization', 'Bearer ' + testUser.tokens[0].token)
+    .set(authHeader, 'Bearer ' + testUser.tokens[0].token)
     .send()
     .expect(200)
 
@@ -116,4 +117,44 @@ test("should not delete user's account if unauthorized", async () => {
     .delete('/users/me')
     .send()
     .expect(401)
+})
+
+test('should upload avatar image', async () => {
+  await req(app)
+    .post('/users/me/avatar')
+    .set(authHeader, 'Bearer ' + testUser.tokens[0].token)
+    .attach('avatar', '__tests__/__fixtures__/iunna.jpg')
+    .expect(200)
+
+  const userWithAvatar = await User.findById(testId)
+  expect(userWithAvatar.avatar).toEqual(expect.any(Buffer))
+})
+
+test('should update user if authenticated', async () => {
+  await req(app)
+    .patch('/users/me')
+    .set(authHeader, 'Bearer ' + testUser.tokens[0].token)
+    .set('Content-Type', 'application/json')
+    .send({ name: 'Nado' })
+    .expect(200)
+
+  const updatedUser = await User.findById(testId)
+  expect(updatedUser.name).toBe('Nado')
+})
+
+test('should not update user if not authenticated', async () => {
+  await req(app)
+    .patch('/users/me')
+    .set('Content-Type', 'application/json')
+    .send({ name: 'Nado' })
+    .expect(401)
+})
+
+test('should not update user if request body contains any invalid field', async () => {
+  await req(app)
+    .patch('/users/me')
+    .set(authHeader, 'Bearer ' + testUser.tokens[0].token)
+    .set('Content-Type', 'application/json')
+    .send({ name: 'Lucas', favoriteFood: 'acai' })
+    .expect(400)
 })
