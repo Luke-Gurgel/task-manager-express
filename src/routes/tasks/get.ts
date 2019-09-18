@@ -12,7 +12,7 @@ export const getTasks = async (req: EnhancedRequest, res: Response): Promise<voi
   const sort = {}
 
   if (req.query.completed) {
-    match.completed = req.query.completed === 'success'
+    match.completed = req.query.completed === 'true'
   }
 
   if (req.query.description) {

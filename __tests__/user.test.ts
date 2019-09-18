@@ -1,7 +1,7 @@
 import req from 'supertest'
 import app from '../src/app'
 import User from '../src/models/user'
-import { setupDB, testUser, testId } from './__fixtures__/db'
+import { setupDB, userOne, userOneId } from './__fixtures__/db'
 
 const authHeader = 'Authorization'
 
@@ -58,7 +58,7 @@ test('should not sign up a new user if password contains the word password', asy
 test('should log in an existing user', async () => {
   const res = await req(app)
     .post('/users/login')
-    .send({ email: testUser.email, password: testUser.password })
+    .send({ email: userOne.email, password: userOne.password })
     .expect(200)
 
   const loggedUser = await User.findById(res.body.user._id)
@@ -75,7 +75,7 @@ test('should not log in a nonexistent user', async () => {
 test('should get profile for user', async () => {
   await req(app)
     .get('/users/me')
-    .set(authHeader, 'Bearer ' + testUser.tokens[0].token)
+    .set(authHeader, 'Bearer ' + userOne.tokens[0].token)
     .send()
     .expect(200)
 })
@@ -90,11 +90,11 @@ test('should not return profile for unauthorized user', async () => {
 test("should delete user's account if authorized", async () => {
   await req(app)
     .delete('/users/me')
-    .set(authHeader, 'Bearer ' + testUser.tokens[0].token)
+    .set(authHeader, 'Bearer ' + userOne.tokens[0].token)
     .send()
     .expect(200)
 
-  const deletedUser = await User.findById(testId)
+  const deletedUser = await User.findById(userOneId)
   expect(deletedUser).toBeNull()
 })
 
@@ -108,23 +108,23 @@ test("should not delete user's account if unauthorized", async () => {
 test('should upload avatar image', async () => {
   await req(app)
     .post('/users/me/avatar')
-    .set(authHeader, 'Bearer ' + testUser.tokens[0].token)
+    .set(authHeader, 'Bearer ' + userOne.tokens[0].token)
     .attach('avatar', '__tests__/__fixtures__/iunna.jpg')
     .expect(200)
 
-  const userWithAvatar = await User.findById(testId)
+  const userWithAvatar = await User.findById(userOneId)
   expect(userWithAvatar.avatar).toEqual(expect.any(Buffer))
 })
 
 test('should update user if authenticated', async () => {
   await req(app)
     .patch('/users/me')
-    .set(authHeader, 'Bearer ' + testUser.tokens[0].token)
+    .set(authHeader, 'Bearer ' + userOne.tokens[0].token)
     .set('Content-Type', 'application/json')
     .send({ name: 'Nado' })
     .expect(200)
 
-  const updatedUser = await User.findById(testId)
+  const updatedUser = await User.findById(userOneId)
   expect(updatedUser.name).toBe('Nado')
 })
 
@@ -139,8 +139,24 @@ test('should not update user if not authenticated', async () => {
 test('should not update user if request body contains any invalid field', async () => {
   await req(app)
     .patch('/users/me')
-    .set(authHeader, 'Bearer ' + testUser.tokens[0].token)
+    .set(authHeader, 'Bearer ' + userOne.tokens[0].token)
     .set('Content-Type', 'application/json')
     .send({ name: 'Lucas', favoriteFood: 'acai' })
     .expect(400)
+})
+
+test('should not update user with invalid email', async () => {
+  await req(app)
+    .patch('/users/me')
+    .set(authHeader, 'Bearer ' + userOne.tokens[0].token)
+    .send({ email: 'invalidemail.com' })
+    .expect(404)
+})
+
+test('should not update user with invalid password', async () => {
+  await req(app)
+    .patch('/users/me')
+    .set(authHeader, 'Bearer ' + userOne.tokens[0].token)
+    .send({ password: '123password' })
+    .expect(404)
 })
