@@ -8,7 +8,7 @@
     "dev": "env-cmd -f ./config/dev.env nodemon src/index.ts",
     "dev:once": "sucrase-node src/index.ts",
     "build": "sucrase ./src -d ./dist --transforms typescript,imports",
-    "test": "env-cmd -f ./config/test.env jest --watch"
+    "test": "env-cmd -f ./config/test.env jest --watch --runInBand"
   },
   "author": "Lucas Gurgel",
   "license": "ISC",
