@@ -2,7 +2,8 @@ import mongoose, { Schema, Document } from 'mongoose'
 
 export interface Task extends Document {
   description: string;
-  completed?: boolean;
+  owner: string;
+  completed: boolean;
 }
 
 const TaskSchema: Schema = new Schema({

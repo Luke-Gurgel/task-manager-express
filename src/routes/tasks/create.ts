@@ -8,6 +8,6 @@ export const createTask = (req: EnhancedRequest, res: Response): void => {
     owner: req.user.id
   })
   task.save()
-    .then(result => res.status(201).send({ message: 'Task created successfully', result }))
-    .catch(error => res.status(400).send(error))
+    .then(task => res.status(201).send({ task }))
+    .catch(error => res.status(500).send({ error }))
 }

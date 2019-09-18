@@ -7,7 +7,7 @@ export const logoutUser = async (req: EnhancedRequest, res: Response): Promise<R
   try {
     allDevices ? user.tokens = [] : user.tokens = user.tokens.filter(tok => tok.token !== token)
     await user.save()
-    res.status(200).send({ message: 'Successfully logged out' })
+    res.status(200).send()
   } catch (error) {
     res.status(500).send({ error })
   }

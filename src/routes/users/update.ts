@@ -18,7 +18,7 @@ export const updateUser = async (req: EnhancedRequest, res: Response): Promise<R
   try {
     bodyFields.forEach(field => { user[field] = req.body[field] })
     await user.save()
-    res.status(200).send({ message: 'User updated successfully', user })
+    res.status(200).send({ user })
   } catch (error) {
     res.status(404).send({ error })
   }
